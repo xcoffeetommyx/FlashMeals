@@ -28,7 +28,6 @@ const mealTagsEl = mustQuery<HTMLSpanElement>("#mealTags");
 const categoryFilter = mustQuery<HTMLDivElement>("#categoryFilter");
 const thumbnailRail = mustQuery<HTMLDivElement>("#thumbnailRail");
 const cardSceneEl = mustQuery<HTMLDivElement>("#cardScene");
-const cardSideEl = mustQuery<HTMLSpanElement>("#cardSide");
 const nextButton = mustQuery<HTMLButtonElement>("#nextButton");
 const saveButton = mustQuery<HTMLButtonElement>("#saveButton");
 const savedButton = mustQuery<HTMLButtonElement>("#savedButton");
@@ -201,7 +200,6 @@ async function setMeal(meal: Meal) {
   mealNameEl.textContent = meal.name;
   mealTimeEl.textContent = `${meal.timeMinutes} min`;
   mealTagsEl.textContent = meal.tags.slice(0, 2).join(" / ");
-  cardSideEl.textContent = "Photo side";
   updateSaveButton();
   renderThumbnailRail();
   applyMaterialTexture(frontMaterial, makeInstantFrontTexture(meal));
@@ -297,10 +295,6 @@ function drawFrontContent(ctx: CanvasRenderingContext2D, meal: Meal) {
 
   drawPill(ctx, `${meal.timeMinutes} min`, 74, 1210, "#f75f3b", "#fff7ed");
   drawPill(ctx, formatCardTag(meal.tags[0]), 246, 1210, tagFill(meal.tags[0]), "#fffdf8");
-
-  ctx.fillStyle = "#5c4640";
-  ctx.font = "500 32px Inter, Arial, sans-serif";
-  ctx.fillText("Photo card", 74, 1290);
 }
 
 function makeBackTexture(meal: Meal): THREE.Texture {
@@ -557,7 +551,6 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
 function toggleFlip() {
   isFlipped = !isFlipped;
   targetRotation = isFlipped ? Math.PI : 0;
-  cardSideEl.textContent = isFlipped ? "Recipe side" : "Photo side";
 }
 
 function setCardFocused(focused: boolean) {

@@ -361,8 +361,7 @@ button {
   object-fit: cover;
 }
 
-.meal-meta span,
-.card-status span {
+.meal-meta span {
   min-height: 34px;
   padding: 0 12px 1px;
   display: inline-flex;
@@ -413,21 +412,6 @@ button {
   height: auto;
   pointer-events: auto;
   filter: drop-shadow(0 36px 58px rgba(0, 0, 0, 0.42));
-}
-
-.card-status {
-  align-self: end;
-  padding-bottom: var(--space-8);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-#cardSide {
-  color: var(--paper);
-  background: var(--ink);
-  border-color: var(--ink);
 }
 
 .controls {
@@ -667,15 +651,6 @@ button {
   .meal-panel h2 {
     max-width: 18ch;
     font-size: 25px;
-  }
-
-  .card-status {
-    width: min(548px, 100%);
-    justify-self: center;
-    align-self: start;
-    padding-bottom: 0;
-    flex-direction: row;
-    flex-wrap: wrap;
   }
 
   #cardCanvas {
