@@ -8,6 +8,7 @@
       name="description"
       content="FlashMeals serves quick five-minute meal ideas as collectible 3D recipe flash cards."
     />
+    <link rel="stylesheet" href="./assets/index.css" data-production-style />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <title>FlashMeals</title>
@@ -95,6 +96,22 @@
       </div>
     </section>
 
-    <script type="module" src="/src/main.ts"></script>
+    <script>
+      window.__FLASHMEALS_LOCAL_DEV__ = ["127.0.0.1", "localhost", "::1"].includes(window.location.hostname);
+      if (window.__FLASHMEALS_LOCAL_DEV__) {
+        document.querySelector("[data-production-style]")?.remove();
+      } else if (!document.querySelector('script[src="./assets/index.js"]')) {
+        const productionScript = document.createElement("script");
+        productionScript.type = "module";
+        productionScript.src = "./assets/index.js";
+        document.head.appendChild(productionScript);
+      }
+    </script>
+    <script type="module" src="/src/main.ts" data-source-entry></script>
+    <script>
+      if (!window.__FLASHMEALS_LOCAL_DEV__) {
+        document.querySelector("[data-source-entry]")?.remove();
+      }
+    </script>
   </body>
 </html>
