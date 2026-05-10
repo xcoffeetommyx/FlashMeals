@@ -4,9 +4,8 @@
   --paper: #fffaf2;
   --paper-strong: #fffdf8;
   --line: #ead7bf;
-  --page: #fff7ed;
-  --grid-line: rgba(47, 111, 115, 0.1);
-  --wash: rgba(255, 207, 90, 0.18);
+  --page: #f7f1e7;
+  --focus-scrim: rgba(23, 21, 17, 0.58);
   --button-surface: rgba(255, 253, 248, 0.72);
   --modal-scrim: rgba(23, 33, 31, 0.42);
   --shadow-soft: rgba(73, 45, 28, 0.22);
@@ -42,9 +41,8 @@
   --paper: #1f211b;
   --paper-strong: #262920;
   --line: #4c4737;
-  --page: #15170f;
-  --grid-line: rgba(255, 250, 242, 0.07);
-  --wash: rgba(247, 95, 59, 0.14);
+  --page: #000000;
+  --focus-scrim: rgba(0, 0, 0, 0.78);
   --button-surface: rgba(38, 41, 32, 0.82);
   --modal-scrim: rgba(7, 8, 5, 0.66);
   --shadow-soft: rgba(0, 0, 0, 0.42);
@@ -69,11 +67,23 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   color: var(--ink);
-  background:
-    linear-gradient(180deg, var(--wash) 0, rgba(255, 207, 90, 0) 240px),
-    linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 100%),
-    var(--page);
-  background-size: auto, 32px 32px, auto;
+  background: var(--page);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  background: var(--focus-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms var(--ease-out);
+}
+
+:root.card-focus-active body::before {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 button,
@@ -372,15 +382,36 @@ button {
   place-items: center;
 }
 
+.card-scene.is-focused {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
+  padding: var(--space-5);
+  pointer-events: none;
+}
+
 #cardCanvas {
   width: min(100%, 548px);
   height: min(66vh, 680px);
   min-height: 440px;
   display: block;
   border-radius: var(--radius-lg);
-  touch-action: manipulation;
-  filter: drop-shadow(0 28px 30px rgba(73, 45, 28, 0.22));
+  touch-action: none;
   filter: drop-shadow(0 28px 30px var(--shadow-soft));
+  transition:
+    width 220ms var(--ease-standard),
+    height 220ms var(--ease-standard),
+    filter 220ms var(--ease-out);
+}
+
+.card-scene.is-focused #cardCanvas {
+  width: min(80vw, 660px);
+  height: min(82vh, 780px);
+  min-height: min(70vh, 620px);
+  pointer-events: auto;
+  filter: drop-shadow(0 36px 58px rgba(0, 0, 0, 0.42));
 }
 
 .card-status {
@@ -720,6 +751,16 @@ button {
     width: min(100%, 420px);
     height: min(35vh, 320px);
     min-height: 280px;
+  }
+
+  .card-scene.is-focused {
+    padding: var(--space-3);
+  }
+
+  .card-scene.is-focused #cardCanvas {
+    width: min(96vw, 460px);
+    height: min(78vh, 700px);
+    min-height: min(68vh, 580px);
   }
 
   .controls {

@@ -27,6 +27,7 @@ const mealTimeEl = mustQuery<HTMLSpanElement>("#mealTime");
 const mealTagsEl = mustQuery<HTMLSpanElement>("#mealTags");
 const categoryFilter = mustQuery<HTMLDivElement>("#categoryFilter");
 const thumbnailRail = mustQuery<HTMLDivElement>("#thumbnailRail");
+const cardSceneEl = mustQuery<HTMLDivElement>("#cardScene");
 const cardSideEl = mustQuery<HTMLSpanElement>("#cardSide");
 const cardSignalEl = mustQuery<HTMLSpanElement>("#cardSignal");
 const nextButton = mustQuery<HTMLButtonElement>("#nextButton");
@@ -58,7 +59,12 @@ renderer.setClearColor(0x000000, 0);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-camera.position.set(0, 0.08, 8.55);
+const defaultCameraZ = 8.55;
+const focusedCameraZ = 7.75;
+let targetCameraZ = defaultCameraZ;
+camera.position.set(0, 0.08, defaultCameraZ);
+const raycaster = new THREE.Raycaster();
+const pointerNdc = new THREE.Vector2();
 
 const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
 keyLight.position.set(3, 4, 5);
@@ -113,9 +119,13 @@ let savedIds = new Set<string>(readSavedIds());
 let activeCategory: MealCategory = "all";
 let currentMeal = pickRandomMeal();
 let isFlipped = false;
+let isCardFocused = false;
 let targetRotation = 0;
 let textureToken = 0;
 let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+let pointerStartX = 0;
+let pointerStartY = 0;
+let pointerStartedOnCanvas = false;
 
 function readSavedIds(): string[] {
   try {
@@ -188,6 +198,7 @@ async function setMeal(meal: Meal) {
   currentMeal = meal;
   isFlipped = false;
   targetRotation = 0;
+  setCardFocused(false);
   mealNameEl.textContent = meal.name;
   mealTimeEl.textContent = `${meal.timeMinutes} min`;
   mealTagsEl.textContent = meal.tags.slice(0, 2).join(" / ");
@@ -251,10 +262,7 @@ function applyMaterialTexture(material: THREE.MeshStandardMaterial, texture: THR
 }
 
 function makeInstantFrontTexture(meal: Meal): THREE.Texture {
-  const textureCanvas = document.createElement("canvas");
-  textureCanvas.width = 1024;
-  textureCanvas.height = 1400;
-  const ctx = requireCanvasContext(textureCanvas);
+  const { canvas: textureCanvas, ctx } = createTextureCanvas();
   drawCardBase(ctx, "#fffaf2");
   drawPhotoFallback(ctx, meal.name);
   drawFrontContent(ctx, meal);
@@ -262,10 +270,7 @@ function makeInstantFrontTexture(meal: Meal): THREE.Texture {
 }
 
 async function makeFrontTexture(meal: Meal): Promise<THREE.Texture> {
-  const textureCanvas = document.createElement("canvas");
-  textureCanvas.width = 1024;
-  textureCanvas.height = 1400;
-  const ctx = requireCanvasContext(textureCanvas);
+  const { canvas: textureCanvas, ctx } = createTextureCanvas();
   drawCardBase(ctx, "#fffaf2");
 
   const image = await loadImage(meal.imageUrl);
@@ -299,10 +304,7 @@ function drawFrontContent(ctx: CanvasRenderingContext2D, meal: Meal) {
 }
 
 function makeBackTexture(meal: Meal): THREE.Texture {
-  const textureCanvas = document.createElement("canvas");
-  textureCanvas.width = 1024;
-  textureCanvas.height = 1400;
-  const ctx = requireCanvasContext(textureCanvas);
+  const { canvas: textureCanvas, ctx } = createTextureCanvas();
   drawCardBase(ctx, "#fffdf8");
 
   ctx.fillStyle = "#f75f3b";
@@ -322,6 +324,16 @@ function makeBackTexture(meal: Meal): THREE.Texture {
   ctx.fillText("Saved locally when you collect it.", 74, 1290);
 
   return canvasToTexture(textureCanvas);
+}
+
+function createTextureCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
+  const scale = 2;
+  const textureCanvas = document.createElement("canvas");
+  textureCanvas.width = 1024 * scale;
+  textureCanvas.height = 1400 * scale;
+  const ctx = requireCanvasContext(textureCanvas);
+  ctx.scale(scale, scale);
+  return { canvas: textureCanvas, ctx };
 }
 
 function requireCanvasContext(textureCanvas: HTMLCanvasElement): CanvasRenderingContext2D {
@@ -548,6 +560,27 @@ function toggleFlip() {
   cardSideEl.textContent = isFlipped ? "Recipe side" : "Photo side";
 }
 
+function setCardFocused(focused: boolean) {
+  isCardFocused = focused;
+  targetCameraZ = focused ? focusedCameraZ : defaultCameraZ;
+  document.documentElement.classList.toggle("card-focus-active", focused);
+  cardSceneEl.classList.toggle("is-focused", focused);
+}
+
+function isPointerOverCard(event: PointerEvent): boolean {
+  const rect = canvas.getBoundingClientRect();
+  const pointerX = (event.clientX - rect.left) / rect.width;
+  const pointerY = (event.clientY - rect.top) / rect.height;
+
+  if (pointerX < 0 || pointerX > 1 || pointerY < 0 || pointerY > 1) {
+    return false;
+  }
+
+  pointerNdc.set(pointerX * 2 - 1, -(pointerY * 2 - 1));
+  raycaster.setFromCamera(pointerNdc, camera);
+  return raycaster.intersectObjects([frontFace, backFace, cardCore], false).length > 0;
+}
+
 function updateSaveButton() {
   const isSaved = savedIds.has(currentMeal.id);
   saveButton.textContent = isSaved ? "Saved" : "Save Card";
@@ -669,14 +702,60 @@ function animate() {
   requestAnimationFrame(animate);
   cardGroup.rotation.y += (targetRotation - cardGroup.rotation.y) * 0.13;
   cardGroup.rotation.z = Math.sin(performance.now() * 0.0007) * 0.018;
+  camera.position.z += (targetCameraZ - camera.position.z) * 0.12;
   renderer.render(scene, camera);
 }
 
 function setupEvents() {
-  canvas.addEventListener("click", toggleFlip);
+  canvas.addEventListener("pointerdown", (event) => {
+    const pointerStartedOnCard = isPointerOverCard(event);
+    if (isCardFocused && !pointerStartedOnCard) {
+      setCardFocused(false);
+      return;
+    }
+
+    pointerStartedOnCanvas = pointerStartedOnCard;
+    if (!pointerStartedOnCanvas) {
+      return;
+    }
+
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    canvas.setPointerCapture(event.pointerId);
+  });
+
+  canvas.addEventListener("pointerup", (event) => {
+    if (!pointerStartedOnCanvas) {
+      return;
+    }
+
+    pointerStartedOnCanvas = false;
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+    const isHorizontalSwipe = Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+
+    if (isHorizontalSwipe) {
+      setCardFocused(true);
+      toggleFlip();
+      return;
+    }
+
+    setCardFocused(true);
+  });
+
+  canvas.addEventListener("pointercancel", () => {
+    pointerStartedOnCanvas = false;
+  });
+
   canvas.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
+      setCardFocused(true);
+    }
+
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      setCardFocused(true);
       toggleFlip();
     }
   });
@@ -728,6 +807,17 @@ function setupEvents() {
   });
 
   window.addEventListener("resize", resize);
+  document.addEventListener("pointerdown", (event) => {
+    if (!isCardFocused) {
+      return;
+    }
+
+    if (cardSceneEl.contains(event.target as Node)) {
+      return;
+    }
+
+    setCardFocused(false);
+  });
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event as BeforeInstallPromptEvent;
