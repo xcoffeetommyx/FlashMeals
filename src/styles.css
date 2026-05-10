@@ -23,6 +23,8 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
+  --card-aspect-width: 0.731;
+  --card-aspect: 3.2 / 4.38;
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--ink);
@@ -393,9 +395,9 @@ button {
 }
 
 #cardCanvas {
-  width: min(100%, 548px);
-  height: min(66vh, 680px);
-  min-height: 440px;
+  width: min(100%, 548px, calc(66vh * var(--card-aspect-width)));
+  height: auto;
+  aspect-ratio: var(--card-aspect);
   display: block;
   border-radius: var(--radius-lg);
   touch-action: none;
@@ -407,9 +409,8 @@ button {
 }
 
 .card-scene.is-focused #cardCanvas {
-  width: min(80vw, 660px);
-  height: min(82vh, 780px);
-  min-height: min(70vh, 620px);
+  width: min(80vw, 660px, calc(82vh * var(--card-aspect-width)));
+  height: auto;
   pointer-events: auto;
   filter: drop-shadow(0 36px 58px rgba(0, 0, 0, 0.42));
 }
@@ -427,10 +428,6 @@ button {
   color: var(--paper);
   background: var(--ink);
   border-color: var(--ink);
-}
-
-#cardSignal {
-  color: var(--herb);
 }
 
 .controls {
@@ -682,8 +679,7 @@ button {
   }
 
   #cardCanvas {
-    height: min(58vh, 600px);
-    min-height: 390px;
+    width: min(100%, 500px, calc(58vh * var(--card-aspect-width)));
   }
 }
 
@@ -748,9 +744,7 @@ button {
   }
 
   #cardCanvas {
-    width: min(100%, 420px);
-    height: min(35vh, 320px);
-    min-height: 280px;
+    width: min(100%, 420px, calc(46vh * var(--card-aspect-width)));
   }
 
   .card-scene.is-focused {
@@ -758,9 +752,7 @@ button {
   }
 
   .card-scene.is-focused #cardCanvas {
-    width: min(96vw, 460px);
-    height: min(78vh, 700px);
-    min-height: min(68vh, 580px);
+    width: min(96vw, 460px, calc(78vh * var(--card-aspect-width)));
   }
 
   .controls {

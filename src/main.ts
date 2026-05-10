@@ -29,7 +29,6 @@ const categoryFilter = mustQuery<HTMLDivElement>("#categoryFilter");
 const thumbnailRail = mustQuery<HTMLDivElement>("#thumbnailRail");
 const cardSceneEl = mustQuery<HTMLDivElement>("#cardScene");
 const cardSideEl = mustQuery<HTMLSpanElement>("#cardSide");
-const cardSignalEl = mustQuery<HTMLSpanElement>("#cardSignal");
 const nextButton = mustQuery<HTMLButtonElement>("#nextButton");
 const saveButton = mustQuery<HTMLButtonElement>("#saveButton");
 const savedButton = mustQuery<HTMLButtonElement>("#savedButton");
@@ -203,7 +202,6 @@ async function setMeal(meal: Meal) {
   mealTimeEl.textContent = `${meal.timeMinutes} min`;
   mealTagsEl.textContent = meal.tags.slice(0, 2).join(" / ");
   cardSideEl.textContent = "Photo side";
-  cardSignalEl.textContent = "Loading photo";
   updateSaveButton();
   renderThumbnailRail();
   applyMaterialTexture(frontMaterial, makeInstantFrontTexture(meal));
@@ -218,7 +216,6 @@ async function setMeal(meal: Meal) {
   }
 
   applyMaterialTexture(frontMaterial, frontTexture);
-  cardSignalEl.textContent = "Photo ready";
 }
 
 function createRoundedRectShape(width: number, height: number, radius: number): THREE.Shape {
@@ -257,6 +254,9 @@ function disposeMaterialMap(material: THREE.MeshStandardMaterial) {
 
 function applyMaterialTexture(material: THREE.MeshStandardMaterial, texture: THREE.Texture) {
   disposeMaterialMap(material);
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
   material.map = texture;
   material.needsUpdate = true;
 }
@@ -807,6 +807,7 @@ function setupEvents() {
   });
 
   window.addEventListener("resize", resize);
+  new ResizeObserver(resize).observe(canvas);
   document.addEventListener("pointerdown", (event) => {
     if (!isCardFocused) {
       return;
