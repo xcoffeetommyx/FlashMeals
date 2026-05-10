@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f75f3b" />
+    <meta
+      name="description"
+      content="FlashMeals serves quick five-minute meal ideas as collectible 3D recipe flash cards."
+    />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <title>FlashMeals</title>
+  </head>
+  <body>
+    <main class="app-shell" aria-labelledby="app-title">
+      <section class="topbar" aria-label="App controls">
+        <div>
+          <p class="kicker">5 minute meal cards</p>
+          <h1 id="app-title">FlashMeals</h1>
+        </div>
+        <div class="top-actions">
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+            <span class="theme-glyph" id="themeGlyph" aria-hidden="true">☾</span>
+          </button>
+          <button class="icon-button" id="savedButton" type="button" aria-label="Open saved recipes">
+            <span aria-hidden="true">Saved</span>
+            <span id="savedCount">0</span>
+          </button>
+          <a class="donate-link" id="donateLink" href="https://ko-fi.com/" target="_blank" rel="noreferrer">
+            Ko-fi
+          </a>
+        </div>
+      </section>
+
+      <section class="stage" aria-label="Meal flash card">
+        <div class="meal-panel" aria-live="polite">
+          <p class="kicker">Now dealing</p>
+          <h2 id="mealName">Loading meal</h2>
+          <div class="meal-meta">
+            <span id="mealTime">5 min</span>
+            <span id="mealTags">quick</span>
+          </div>
+          <div class="thumbnail-rail" id="thumbnailRail" aria-label="Meal photo thumbnails"></div>
+        </div>
+
+        <div class="card-scene">
+          <canvas id="cardCanvas" data-testid="card-canvas" aria-label="3D FlashMeals recipe card"></canvas>
+        </div>
+
+        <div class="card-status" aria-live="polite">
+          <span id="cardSide">Photo side</span>
+          <span id="cardSignal">Card ready</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Recipe controls">
+        <button class="primary-action" id="nextButton" type="button">Next Meal</button>
+        <button class="save-action" id="saveButton" type="button">Save Card</button>
+      </section>
+    </main>
+
+    <aside class="collection" id="collectionDrawer" aria-hidden="true" aria-label="Saved recipes">
+      <div class="collection-panel">
+        <div class="collection-header">
+          <div>
+            <p class="kicker">Your collection</p>
+            <h2>Saved Meals</h2>
+          </div>
+          <button class="icon-button" id="closeDrawerButton" type="button" aria-label="Close saved recipes">
+            Close
+          </button>
+        </div>
+        <div class="saved-list" id="savedList"></div>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

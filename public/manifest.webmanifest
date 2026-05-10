@@ -1,0 +1,17 @@
+{
+  "name": "FlashMeals",
+  "short_name": "FlashMeals",
+  "description": "Quick five-minute meal ideas in collectible 3D flash card form.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff7ed",
+  "theme_color": "#f75f3b",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
