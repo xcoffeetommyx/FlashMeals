@@ -10,8 +10,8 @@ export type Meal = {
 };
 
 const photo = (id: string) => ({
-  imageUrl: `/meal-images/${id}.jpg`,
-  thumbnailUrl: `/meal-images/${id}-thumb.jpg`
+  imageUrl: `${import.meta.env.BASE_URL}meal-images/${id}.jpg`,
+  thumbnailUrl: `${import.meta.env.BASE_URL}meal-images/${id}-thumb.jpg`
 });
 
 export const meals: Meal[] = [
@@ -229,6 +229,222 @@ export const meals: Meal[] = [
     ingredients: ["Toast", "Almond butter", "Sliced strawberries", "Blueberries", "Maple syrup"],
     steps: ["Spread almond butter on toast.", "Add berries.", "Drizzle maple syrup over the top."],
     tags: ["breakfast", "sweet"],
+    timeMinutes: 5
+  },
+  {
+    id: "blueberry-yogurt-parfait",
+    name: "Blueberry Yogurt Parfait",
+    ...photo("greek-yogurt-bowl"),
+    ingredients: ["Greek yogurt", "Blueberries", "Granola", "Honey", "Lemon zest"],
+    steps: ["Layer yogurt and blueberries.", "Add granola.", "Finish with honey and lemon zest."],
+    tags: ["breakfast", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "cheddar-egg-bagel",
+    name: "Cheddar Egg Bagel",
+    ...photo("smoked-salmon-bagel"),
+    ingredients: ["Bagel thin", "Cooked egg", "Cheddar", "Spinach", "Hot sauce"],
+    steps: ["Toast the bagel.", "Layer egg, cheddar, and spinach.", "Add hot sauce and close."],
+    tags: ["breakfast", "lunch"],
+    timeMinutes: 5
+  },
+  {
+    id: "strawberry-almond-bowl",
+    name: "Strawberry Almond Bowl",
+    ...photo("berry-almond-toast"),
+    ingredients: ["Greek yogurt", "Sliced strawberries", "Almond butter", "Granola", "Maple syrup"],
+    steps: ["Spoon yogurt into a bowl.", "Add strawberries and granola.", "Swirl in almond butter and syrup."],
+    tags: ["breakfast", "sweet"],
+    timeMinutes: 5
+  },
+  {
+    id: "cottage-berry-toast",
+    name: "Cottage Berry Toast",
+    ...photo("cottage-cheese-savory-bowl"),
+    ingredients: ["Toast", "Cottage cheese", "Berries", "Honey", "Black pepper"],
+    steps: ["Spread cottage cheese on toast.", "Top with berries.", "Finish with honey and pepper."],
+    tags: ["breakfast", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "banana-yogurt-crunch",
+    name: "Banana Yogurt Crunch",
+    ...photo("banana-peanut-rollup"),
+    ingredients: ["Greek yogurt", "Banana slices", "Peanut butter", "Granola", "Cinnamon"],
+    steps: ["Add yogurt to a bowl.", "Top with banana and granola.", "Drizzle peanut butter and cinnamon."],
+    tags: ["breakfast", "sweet"],
+    timeMinutes: 5
+  },
+  {
+    id: "savory-avocado-plate",
+    name: "Savory Avocado Plate",
+    ...photo("avocado-egg-toast"),
+    ingredients: ["Avocado", "Boiled egg", "Crackers", "Everything seasoning", "Lemon"],
+    steps: ["Slice avocado and egg.", "Arrange with crackers.", "Season with lemon and everything seasoning."],
+    tags: ["breakfast", "no cook"],
+    timeMinutes: 5
+  },
+  {
+    id: "breakfast-pita-pocket",
+    name: "Breakfast Pita Pocket",
+    ...photo("caprese-pita"),
+    ingredients: ["Pita", "Scrambled egg", "Tomato", "Spinach", "Feta"],
+    steps: ["Warm pita.", "Fill with egg, tomato, and spinach.", "Sprinkle feta inside."],
+    tags: ["breakfast", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "apple-peanut-toast",
+    name: "Apple Peanut Toast",
+    ...photo("apple-cheddar-plate"),
+    ingredients: ["Toast", "Peanut butter", "Apple slices", "Honey", "Cinnamon"],
+    steps: ["Spread peanut butter on toast.", "Layer apple slices.", "Add honey and cinnamon."],
+    tags: ["breakfast", "sweet"],
+    timeMinutes: 5
+  },
+  {
+    id: "chicken-caesar-wrap",
+    name: "Chicken Caesar Wrap",
+    ...photo("hummus-veggie-wrap"),
+    ingredients: ["Tortilla", "Cooked chicken", "Romaine", "Caesar dressing", "Parmesan"],
+    steps: ["Spread dressing on tortilla.", "Add chicken, romaine, and Parmesan.", "Roll tight and slice."],
+    tags: ["lunch", "no cook"],
+    timeMinutes: 5
+  },
+  {
+    id: "turkey-apple-wrap",
+    name: "Turkey Apple Wrap",
+    ...photo("turkey-ranch-pinwheels"),
+    ingredients: ["Tortilla", "Turkey slices", "Apple matchsticks", "Cheddar", "Dijon"],
+    steps: ["Spread Dijon on tortilla.", "Add turkey, apple, and cheddar.", "Roll and cut in half."],
+    tags: ["lunch", "no cook"],
+    timeMinutes: 5
+  },
+  {
+    id: "mediterranean-hummus-box",
+    name: "Hummus Snack Box",
+    ...photo("apple-cheddar-plate"),
+    ingredients: ["Hummus", "Pita chips", "Cucumber", "Cherry tomatoes", "Feta"],
+    steps: ["Spoon hummus into a cup.", "Pack pita chips and vegetables.", "Add feta on the side."],
+    tags: ["lunch", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "chickpea-avocado-pita",
+    name: "Chickpea Avocado Pita",
+    ...photo("chickpea-salad-cup"),
+    ingredients: ["Pita", "Canned chickpeas", "Avocado", "Lime", "Cilantro"],
+    steps: ["Mash chickpeas with avocado and lime.", "Spoon into pita.", "Top with cilantro."],
+    tags: ["lunch", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "salmon-cucumber-stack",
+    name: "Salmon Cucumber Stack",
+    ...photo("smoked-salmon-bagel"),
+    ingredients: ["Cucumber rounds", "Cream cheese", "Smoked salmon", "Capers", "Dill"],
+    steps: ["Spread cream cheese on cucumber.", "Add salmon.", "Top with capers and dill."],
+    tags: ["lunch", "low carb"],
+    timeMinutes: 5
+  },
+  {
+    id: "tuna-white-bean-salad",
+    name: "Tuna White Bean Salad",
+    ...photo("tuna-cucumber-boats"),
+    ingredients: ["Tuna pouch", "White beans", "Olive oil", "Lemon", "Parsley"],
+    steps: ["Mix tuna and beans.", "Dress with olive oil and lemon.", "Add parsley."],
+    tags: ["lunch", "no cook"],
+    timeMinutes: 5
+  },
+  {
+    id: "caprese-cracker-stack",
+    name: "Caprese Cracker Stack",
+    ...photo("caprese-pita"),
+    ingredients: ["Crackers", "Mozzarella", "Tomato", "Basil", "Balsamic glaze"],
+    steps: ["Layer mozzarella and tomato on crackers.", "Add basil.", "Drizzle balsamic glaze."],
+    tags: ["lunch", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "buffalo-turkey-cup",
+    name: "Buffalo Turkey Cup",
+    ...photo("buffalo-chickpea-wrap"),
+    ingredients: ["Turkey slices", "Buffalo sauce", "Ranch", "Celery", "Lettuce cups"],
+    steps: ["Toss turkey with buffalo sauce.", "Spoon into lettuce cups.", "Top with ranch and celery."],
+    tags: ["lunch", "low carb"],
+    timeMinutes: 5
+  },
+  {
+    id: "bbq-bean-rice-cup",
+    name: "BBQ Bean Rice Cup",
+    ...photo("teriyaki-rice-bowl"),
+    ingredients: ["Microwave rice", "Black beans", "BBQ sauce", "Corn", "Green onion"],
+    steps: ["Microwave rice and beans.", "Stir in BBQ sauce and corn.", "Top with green onion."],
+    tags: ["dinner", "microwave"],
+    timeMinutes: 5
+  },
+  {
+    id: "spicy-peanut-rice",
+    name: "Spicy Peanut Rice",
+    ...photo("peanut-noodles"),
+    ingredients: ["Microwave rice", "Peanut butter", "Soy sauce", "Sriracha", "Frozen peas"],
+    steps: ["Heat rice and peas.", "Stir peanut butter with soy and sriracha.", "Fold sauce into rice."],
+    tags: ["dinner", "microwave"],
+    timeMinutes: 5
+  },
+  {
+    id: "pesto-chicken-pita",
+    name: "Pesto Chicken Pita",
+    ...photo("pesto-tortellini-cup"),
+    ingredients: ["Pita", "Cooked chicken", "Pesto", "Tomato", "Parmesan"],
+    steps: ["Warm pita.", "Fill with chicken and tomato.", "Add pesto and Parmesan."],
+    tags: ["dinner", "lunch"],
+    timeMinutes: 5
+  },
+  {
+    id: "ramen-spinach-bowl",
+    name: "Ramen Spinach Bowl",
+    ...photo("ramen-egg-cup"),
+    ingredients: ["Instant ramen", "Spinach", "Soft-boiled egg", "Soy sauce", "Sesame seeds"],
+    steps: ["Cook ramen.", "Stir in spinach.", "Top with egg, soy, and sesame."],
+    tags: ["dinner", "microwave"],
+    timeMinutes: 5
+  },
+  {
+    id: "quesadilla-pizza-fold",
+    name: "Pizza Quesadilla",
+    ...photo("pizza-english-muffin"),
+    ingredients: ["Tortilla", "Pizza sauce", "Mozzarella", "Pepperoni", "Italian seasoning"],
+    steps: ["Fill tortilla with sauce, cheese, and pepperoni.", "Fold and toast.", "Cut into wedges."],
+    tags: ["dinner", "skillet"],
+    timeMinutes: 5
+  },
+  {
+    id: "tomato-bean-toast",
+    name: "Tomato Bean Toast",
+    ...photo("tomato-soup-melt"),
+    ingredients: ["Toast", "White beans", "Tomato sauce", "Basil", "Parmesan"],
+    steps: ["Warm beans with tomato sauce.", "Spoon over toast.", "Finish with basil and Parmesan."],
+    tags: ["dinner", "vegetarian"],
+    timeMinutes: 5
+  },
+  {
+    id: "teriyaki-chicken-cup",
+    name: "Teriyaki Chicken Cup",
+    ...photo("teriyaki-rice-bowl"),
+    ingredients: ["Microwave rice", "Cooked chicken", "Teriyaki sauce", "Edamame", "Sesame seeds"],
+    steps: ["Heat rice, chicken, and edamame.", "Stir in teriyaki sauce.", "Top with sesame seeds."],
+    tags: ["dinner", "microwave"],
+    timeMinutes: 5
+  },
+  {
+    id: "loaded-nacho-rice",
+    name: "Loaded Nacho Rice",
+    ...photo("microwave-nachos"),
+    ingredients: ["Microwave rice", "Shredded cheese", "Salsa", "Black beans", "Greek yogurt"],
+    steps: ["Heat rice, beans, and cheese.", "Add salsa.", "Finish with Greek yogurt."],
+    tags: ["dinner", "microwave"],
     timeMinutes: 5
   }
 ];

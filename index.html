@@ -41,6 +41,12 @@
             <span id="mealTime">5 min</span>
             <span id="mealTags">quick</span>
           </div>
+          <div class="category-filter" id="categoryFilter" aria-label="Meal categories">
+            <button class="category-button is-active" type="button" data-category="all" aria-pressed="true">All</button>
+            <button class="category-button" type="button" data-category="breakfast" aria-pressed="false">Breakfast</button>
+            <button class="category-button" type="button" data-category="lunch" aria-pressed="false">Lunch</button>
+            <button class="category-button" type="button" data-category="dinner" aria-pressed="false">Dinner</button>
+          </div>
           <div class="thumbnail-rail" id="thumbnailRail" aria-label="Meal photo thumbnails"></div>
         </div>
 
@@ -74,6 +80,20 @@
         <div class="saved-list" id="savedList"></div>
       </div>
     </aside>
+
+    <section class="install-prompt" id="installPrompt" aria-hidden="true" aria-label="Install FlashMeals">
+      <div class="install-panel">
+        <div>
+          <p class="kicker">Install app</p>
+          <h2>Keep FlashMeals on your device</h2>
+          <p>Open quick meal cards from your home screen and keep the app ready for offline cooking ideas.</p>
+        </div>
+        <div class="install-actions">
+          <button class="primary-action" id="installButton" type="button">Install</button>
+          <button class="icon-button" id="dismissInstallButton" type="button">Later</button>
+        </div>
+      </div>
+    </section>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

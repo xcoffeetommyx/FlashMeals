@@ -4,7 +4,14 @@ import { meals, type Meal } from "./meals";
 
 const STORAGE_KEY = "flashmeals.saved.v1";
 const THEME_KEY = "flashmeals.theme.v1";
+const INSTALL_DISMISSED_KEY = "flashmeals.install.dismissed.v1";
 const DONATION_URL = "https://ko-fi.com/";
+
+type MealCategory = "all" | "breakfast" | "lunch" | "dinner";
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
 
 function mustQuery<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -18,6 +25,7 @@ const canvas = mustQuery<HTMLCanvasElement>("#cardCanvas");
 const mealNameEl = mustQuery<HTMLSpanElement>("#mealName");
 const mealTimeEl = mustQuery<HTMLSpanElement>("#mealTime");
 const mealTagsEl = mustQuery<HTMLSpanElement>("#mealTags");
+const categoryFilter = mustQuery<HTMLDivElement>("#categoryFilter");
 const thumbnailRail = mustQuery<HTMLDivElement>("#thumbnailRail");
 const cardSideEl = mustQuery<HTMLSpanElement>("#cardSide");
 const cardSignalEl = mustQuery<HTMLSpanElement>("#cardSignal");
@@ -31,6 +39,9 @@ const drawer = mustQuery<HTMLElement>("#collectionDrawer");
 const closeDrawerButton = mustQuery<HTMLButtonElement>("#closeDrawerButton");
 const savedList = mustQuery<HTMLDivElement>("#savedList");
 const donateLink = mustQuery<HTMLAnchorElement>("#donateLink");
+const installPrompt = mustQuery<HTMLElement>("#installPrompt");
+const installButton = mustQuery<HTMLButtonElement>("#installButton");
+const dismissInstallButton = mustQuery<HTMLButtonElement>("#dismissInstallButton");
 
 donateLink.href = DONATION_URL;
 applyTheme(readTheme());
@@ -99,10 +110,12 @@ backFace.rotation.y = Math.PI;
 cardGroup.add(frontFace, backFace);
 
 let savedIds = new Set<string>(readSavedIds());
+let activeCategory: MealCategory = "all";
 let currentMeal = pickRandomMeal();
 let isFlipped = false;
 let targetRotation = 0;
 let textureToken = 0;
+let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
 
 function readSavedIds(): string[] {
   try {
@@ -138,10 +151,37 @@ function toggleTheme() {
   applyTheme(nextTheme);
 }
 
+function filteredMeals(): Meal[] {
+  if (activeCategory === "all") {
+    return meals;
+  }
+  return meals.filter((meal) => meal.tags.includes(activeCategory));
+}
+
 function pickRandomMeal(excludeId?: string): Meal {
-  const pool = meals.filter((meal) => meal.id !== excludeId);
-  const source = pool.length > 0 ? pool : meals;
+  const categoryMeals = filteredMeals();
+  const pool = categoryMeals.filter((meal) => meal.id !== excludeId);
+  const source = pool.length > 0 ? pool : categoryMeals.length > 0 ? categoryMeals : meals;
   return source[Math.floor(Math.random() * source.length)];
+}
+
+function updateCategoryButtons() {
+  categoryFilter.querySelectorAll<HTMLButtonElement>("[data-category]").forEach((button) => {
+    const isActive = button.dataset.category === activeCategory;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function selectCategory(category: MealCategory) {
+  activeCategory = category;
+  updateCategoryButtons();
+  const pool = filteredMeals();
+  if (!pool.some((meal) => meal.id === currentMeal.id)) {
+    void setMeal(pickRandomMeal());
+    return;
+  }
+  renderThumbnailRail();
 }
 
 async function setMeal(meal: Meal) {
@@ -557,8 +597,10 @@ function renderSavedList() {
 }
 
 function renderThumbnailRail() {
-  const currentIndex = Math.max(0, meals.findIndex((meal) => meal.id === currentMeal.id));
-  const visibleMeals = Array.from({ length: 5 }, (_value, offset) => meals[(currentIndex + offset) % meals.length]);
+  const pool = filteredMeals();
+  const sourceMeals = pool.length > 0 ? pool : meals;
+  const currentIndex = Math.max(0, sourceMeals.findIndex((meal) => meal.id === currentMeal.id));
+  const visibleMeals = Array.from({ length: Math.min(5, sourceMeals.length) }, (_value, offset) => sourceMeals[(currentIndex + offset) % sourceMeals.length]);
   thumbnailRail.innerHTML = visibleMeals
     .map(
       (meal) => `
@@ -568,6 +610,41 @@ function renderThumbnailRail() {
       `
     )
     .join("");
+}
+
+function showInstallPrompt() {
+  if (localStorage.getItem(INSTALL_DISMISSED_KEY) === "true") {
+    return;
+  }
+  if (window.matchMedia("(display-mode: standalone)").matches) {
+    return;
+  }
+  installPrompt.setAttribute("aria-hidden", "false");
+}
+
+function hideInstallPrompt() {
+  installPrompt.setAttribute("aria-hidden", "true");
+}
+
+async function installApp() {
+  if (!deferredInstallPrompt) {
+    hideInstallPrompt();
+    return;
+  }
+
+  await deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  hideInstallPrompt();
+
+  if (choice.outcome === "dismissed") {
+    localStorage.setItem(INSTALL_DISMISSED_KEY, "true");
+  }
+}
+
+function dismissInstallPrompt() {
+  localStorage.setItem(INSTALL_DISMISSED_KEY, "true");
+  hideInstallPrompt();
 }
 
 function openDrawer() {
@@ -610,8 +687,19 @@ function setupEvents() {
 
   saveButton.addEventListener("click", toggleSave);
   themeToggle.addEventListener("click", toggleTheme);
+  installButton.addEventListener("click", () => {
+    void installApp();
+  });
+  dismissInstallButton.addEventListener("click", dismissInstallPrompt);
   savedButton.addEventListener("click", openDrawer);
   closeDrawerButton.addEventListener("click", closeDrawer);
+  categoryFilter.addEventListener("click", (event) => {
+    const categoryButton = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-category]");
+    const category = categoryButton?.dataset.category;
+    if (category === "all" || category === "breakfast" || category === "lunch" || category === "dinner") {
+      selectCategory(category);
+    }
+  });
   thumbnailRail.addEventListener("click", (event) => {
     const thumbnailButton = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-thumb-meal-id]");
     if (!thumbnailButton?.dataset.thumbMealId) {
@@ -640,6 +728,16 @@ function setupEvents() {
   });
 
   window.addEventListener("resize", resize);
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event as BeforeInstallPromptEvent;
+    window.setTimeout(showInstallPrompt, 1400);
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    localStorage.setItem(INSTALL_DISMISSED_KEY, "true");
+    hideInstallPrompt();
+  });
 }
 
 function registerServiceWorker() {
@@ -668,6 +766,7 @@ setupEvents();
 resize();
 renderSavedList();
 updateSaveButton();
+updateCategoryButtons();
 void setMeal(currentMeal);
 animate();
 registerServiceWorker();
