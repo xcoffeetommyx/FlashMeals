@@ -124,6 +124,7 @@ let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
 let pointerStartX = 0;
 let pointerStartY = 0;
 let pointerStartedOnCanvas = false;
+let focusAnimationTimeout = 0;
 
 function readSavedIds(): string[] {
   try {
@@ -554,10 +555,30 @@ function toggleFlip() {
 }
 
 function setCardFocused(focused: boolean) {
+  window.clearTimeout(focusAnimationTimeout);
   isCardFocused = focused;
   targetCameraZ = focused ? focusedCameraZ : defaultCameraZ;
   document.documentElement.classList.toggle("card-focus-active", focused);
-  cardSceneEl.classList.toggle("is-focused", focused);
+
+  if (focused) {
+    cardSceneEl.classList.remove("is-unfocusing");
+    cardSceneEl.classList.add("is-focused", "is-focusing");
+    focusAnimationTimeout = window.setTimeout(() => {
+      cardSceneEl.classList.remove("is-focusing");
+    }, 280);
+    return;
+  }
+
+  if (!cardSceneEl.classList.contains("is-focused")) {
+    cardSceneEl.classList.remove("is-focusing", "is-unfocusing");
+    return;
+  }
+
+  cardSceneEl.classList.remove("is-focusing");
+  cardSceneEl.classList.add("is-unfocusing");
+  focusAnimationTimeout = window.setTimeout(() => {
+    cardSceneEl.classList.remove("is-focused", "is-unfocusing");
+  }, 240);
 }
 
 function isPointerOverCard(event: PointerEvent): boolean {

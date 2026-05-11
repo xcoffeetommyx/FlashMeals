@@ -401,9 +401,11 @@ button {
   border-radius: var(--radius-lg);
   touch-action: none;
   filter: drop-shadow(0 28px 30px var(--shadow-soft));
+  transform-origin: center;
   transition:
     width 220ms var(--ease-standard),
     height 220ms var(--ease-standard),
+    transform 220ms var(--ease-standard),
     filter 220ms var(--ease-out);
 }
 
@@ -412,6 +414,42 @@ button {
   height: auto;
   pointer-events: auto;
   filter: drop-shadow(0 36px 58px rgba(0, 0, 0, 0.42));
+}
+
+.card-scene.is-focusing #cardCanvas {
+  animation: card-focus-in 260ms var(--ease-standard) both;
+}
+
+.card-scene.is-unfocusing {
+  pointer-events: none;
+}
+
+.card-scene.is-unfocusing #cardCanvas {
+  animation: card-focus-out 220ms var(--ease-standard) both;
+}
+
+@keyframes card-focus-in {
+  from {
+    opacity: 0.86;
+    transform: scale(0.82) translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes card-focus-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.82) translateY(18px);
+  }
 }
 
 .controls {

@@ -9,9 +9,9 @@ export type Meal = {
   timeMinutes: number;
 };
 
-const photo = (id: string) => ({
-  imageUrl: `${import.meta.env.BASE_URL}meal-images/${id}.jpg`,
-  thumbnailUrl: `${import.meta.env.BASE_URL}meal-images/${id}-thumb.jpg`
+const photo = (id: string, extension = "jpg") => ({
+  imageUrl: `${import.meta.env.BASE_URL}meal-images/${id}.${extension}`,
+  thumbnailUrl: `${import.meta.env.BASE_URL}meal-images/${id}-thumb.${extension}`
 });
 
 export const meals: Meal[] = [
@@ -234,7 +234,7 @@ export const meals: Meal[] = [
   {
     id: "blueberry-yogurt-parfait",
     name: "Blueberry Yogurt Parfait",
-    ...photo("greek-yogurt-bowl"),
+    ...photo("blueberry-yogurt-parfait", "png"),
     ingredients: ["Greek yogurt", "Blueberries", "Granola", "Honey", "Lemon zest"],
     steps: ["Layer yogurt and blueberries.", "Add granola.", "Finish with honey and lemon zest."],
     tags: ["breakfast", "vegetarian"],
@@ -243,7 +243,7 @@ export const meals: Meal[] = [
   {
     id: "cheddar-egg-bagel",
     name: "Cheddar Egg Bagel",
-    ...photo("smoked-salmon-bagel"),
+    ...photo("cheddar-egg-bagel", "png"),
     ingredients: ["Bagel thin", "Cooked egg", "Cheddar", "Spinach", "Hot sauce"],
     steps: ["Toast the bagel.", "Layer egg, cheddar, and spinach.", "Add hot sauce and close."],
     tags: ["breakfast", "lunch"],
@@ -252,7 +252,7 @@ export const meals: Meal[] = [
   {
     id: "strawberry-almond-bowl",
     name: "Strawberry Almond Bowl",
-    ...photo("berry-almond-toast"),
+    ...photo("strawberry-almond-bowl", "png"),
     ingredients: ["Greek yogurt", "Sliced strawberries", "Almond butter", "Granola", "Maple syrup"],
     steps: ["Spoon yogurt into a bowl.", "Add strawberries and granola.", "Swirl in almond butter and syrup."],
     tags: ["breakfast", "sweet"],
@@ -261,7 +261,7 @@ export const meals: Meal[] = [
   {
     id: "cottage-berry-toast",
     name: "Cottage Berry Toast",
-    ...photo("cottage-cheese-savory-bowl"),
+    ...photo("cottage-berry-toast", "png"),
     ingredients: ["Toast", "Cottage cheese", "Berries", "Honey", "Black pepper"],
     steps: ["Spread cottage cheese on toast.", "Top with berries.", "Finish with honey and pepper."],
     tags: ["breakfast", "vegetarian"],
@@ -270,7 +270,7 @@ export const meals: Meal[] = [
   {
     id: "banana-yogurt-crunch",
     name: "Banana Yogurt Crunch",
-    ...photo("banana-peanut-rollup"),
+    ...photo("banana-yogurt-crunch", "png"),
     ingredients: ["Greek yogurt", "Banana slices", "Peanut butter", "Granola", "Cinnamon"],
     steps: ["Add yogurt to a bowl.", "Top with banana and granola.", "Drizzle peanut butter and cinnamon."],
     tags: ["breakfast", "sweet"],
